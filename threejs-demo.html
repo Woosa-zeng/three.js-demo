@@ -1,0 +1,242 @@
+
+<html>
+  <head>
+<title>three.js demo</title>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+
+
+<link rel="stylesheet" href="./assets/stylesheets/main.7bc693a73b39203a584e.css"/>
+
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+    <script src="./assets/javascripts/main.cc7574a72bb706e76c70.js"></script>
+
+  </head>
+
+  <body class="body--homepage" data-bind="css: { 'is-IE11': $root.pages.base.isIE11 }">
+
+<div class="overlay" id="overlay">
+  <div class="overlay__spinner"></div>
+</div>
+
+<button class="overlay--sound" id="toggle-sound">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14 20H0v24h13.4L31 56.6V8L14 20.2zm41.8 12c0-8.5-7-15.5-15.5-15.5v3c6.9 0 12.5 5.6 12.5 12.5s-5.6 12.5-12.5 12.5v3c8.5 0 15.5-7 15.5-15.5z"/><path d="M48.8 32c0-4.7-3.8-8.5-8.5-8.5v3c3 0 5.5 2.5 5.5 5.5s-2.5 5.5-5.5 5.5v3c4.7 0 8.5-3.8 8.5-8.5z"/><path d="M40.3 9.5v3c10.8 0 19.5 8.7 19.5 19.5s-8.7 19.5-19.5 19.5v3c12.4 0 22.5-10.1 22.5-22.5S52.7 9.5 40.3 9.5z"/></svg>
+
+</button>
+<div class="intro" id="intro">
+  <div class="intro__inner">
+    <button class="button" id="toggle-intro">Start</button>
+  </div>
+</div>
+
+<a-scene load-check camera-toggle sound-toggle>
+  <!-- Assets -->
+  <a-assets>
+    <a-asset-item id="city" src="./assets/models/city-baked.dae"></a-asset-item>
+    <a-asset-item id="cloud1" src="./assets/models/cloud1.dae"></a-asset-item>
+    <a-asset-item id="cloud2" src="./assets/models/cloud2.dae"></a-asset-item>
+    <a-asset-item id="blimp" src="./assets/models/blimp.dae"></a-asset-item>
+    <a-asset-item id="ferry" src="./assets/models/ferry.dae"></a-asset-item>
+    <a-asset-item id="satellite" src="./assets/models/satellite.dae"></a-asset-item>
+    <a-asset-item id="moon" src="./assets/models/moon.dae"></a-asset-item>
+    <a-asset-item id="sun" src="./assets/models/sun.dae"></a-asset-item>
+    <audio id="piano-sound" src="./assets/sound/piano.mp3" preload="auto">
+    <audio id="satellite-sound" src="./assets/sound/satellite.mp3" preload="auto">
+    <audio id="blimp-sound" src="./assets/sound/blimp.mp3" preload="auto">
+    <audio id="river-sound" src="./assets/sound/river.mp3" preload="auto">
+    <audio id="street-sound" src="./assets/sound/street.mp3" preload="auto">
+    <img id="sky" src="./assets/models/sky.jpg">
+  </a-assets>
+
+  <!-- Sound -->
+  <a-entity id="piano-sound-el" sound="src: #piano-sound; autoplay: true; loop: true; volume: 10"></a-entity>
+
+  <!-- Snow -->
+  <a-entity position="0 12 0"
+            particle-system="preset: snow; particleCount: 1000; size: 0.8; type: 3; maxAge: 6;"></a-entity>
+
+  <!-- Orbital Camera -->
+  <a-entity
+    id="wide-camera"
+    camera="fov: 90;"
+    position="0 0 5"
+    orbit-controls="
+                enabled: true;
+                autoRotate: true;
+                autoRotateSpeed: 0.05;
+                target: #target;
+                enableDamping: true;
+                dampingFactor: 0.125;
+                rotateSpeed: 0.15;
+                minDistance: 20;
+                maxDistance: 30;
+                maxPolarAngle: 1.3;
+                zoomSpeed: 0.4"
+    mouse-cursor=""
+  ></a-entity>
+
+  <!-- Blimp track -->
+  <a-curve id="blimp-track" type="CatmullRom" curve="closed:true">
+    <a-curve-point id="checkpoint1" position="10 9 -10"></a-curve-point>
+    <a-curve-point id="checkpoint2" position="10 6 10"></a-curve-point>
+    <a-curve-point id="checkpoint3" position="-10 7 10"></a-curve-point>
+    <a-curve-point id="checkpoint4" position="-10 9 -10"></a-curve-point>
+  </a-curve>
+
+  <!-- First person camera -->
+  <a-entity alongpath="curve: #blimp-track; loop:true; dur:60000; rotate:false;">
+    <a-entity id="blimp-sound-el" sound="src: #blimp-sound; autoplay: true; loop: true; volume: 0.02"></a-entity>
+    <a-entity>
+      <a-entity
+        id="fps-camera"
+        camera="fov: 70"
+        position="0 -0.47 0"
+        rotation="-4 -45 0"
+        mouse-cursor=""
+        look-controls
+      ></a-entity>
+      <a-animation attribute="rotation"
+                   from="0 180 0"
+                   to="0 -180 0"
+                   dur="60000"
+                   fill="forwards"
+                   repeat="indefinite"
+                   easing="linear">
+      </a-animation>
+    </a-entity>
+    <a-entity id="blimp" collada-model="#blimp" scale="0.3 0.3 0.3">
+      <a-animation attribute="rotation"
+                   from="-90 -55 0"
+                   to="-90 -55 -360"
+                   dur="60000"
+                   fill="forwards"
+                   repeat="indefinite"
+                   easing="linear">
+      </a-animation>
+    </a-entity>
+  </a-entity>
+
+  <!-- The World -->
+  <a-entity id="target" scale="5 5 5">
+    <a-entity id="city-el" collada-model="#city" scale="2.9 2.9 2.9" rotation="0 -90 0">
+      <a-entity id="river-sound-el" sound="src: #river-sound; autoplay: true; loop: true; volume: 0.5" position="0.68 0.11 0.22"></a-entity>
+
+      <a-entity id="street-sound-el" sound="src: #street-sound; autoplay: true; loop: true; volume: 10" position="-0.34 0.35 0.22"></a-entity>
+
+      <!-- Ferry -->
+      <a-entity id="ferry-el" collada-model="#ferry">
+        <a-animation attribute="rotation"
+                     from="0 0 0"
+                     to="0 0 0.5"
+                     dur="2000"
+                     direction="alternate"
+                     fill="forwards"
+                     repeat="indefinite"></a-animation>
+      </a-entity>
+    </a-entity>
+
+
+    <!-- Clouds -->
+    <a-entity id="cloud1-el" collada-model="#cloud1" scale="0.06 0.06 0.06" position="1.87 2.25 -0.19" rotation="0 77 0">
+      <a-animation attribute="position"
+                   from="-1.87 2.25 -0.19"
+                   to="-1.87 2.35 -0.19"
+                   dur="1500"
+                   direction="alternate"
+                   fill="forwards"
+                   repeat="indefinite"></a-animation>
+    </a-entity>
+    <a-entity id="cloud2-el" collada-model="#cloud2" scale="0.06 0.06 0.06" position="2 1.9 1.09" rotation="0 68 0">
+      <a-animation attribute="position"
+                   from="2 1.8 1.09"
+                   to="2 1.9 1.09"
+                   dur="1500"
+                   direction="alternate"
+                   fill="forwards"
+                   repeat="indefinite"></a-animation>
+    </a-entity>
+    <a-entity id="cloud2-el" collada-model="#cloud2" scale="0.05 0.05 0.05" position="1.72 1.8 -1.54" rotation="0 132 0">
+      <a-animation attribute="position"
+                   from="1.72 1.8 -1.54"
+                   to="1.72 1.7 -1.54"
+                   dur="1500"
+                   direction="alternate"
+                   fill="forwards"
+                   repeat="indefinite"></a-animation>
+    </a-entity>
+
+    <!-- Sphere -->
+    <a-entity id="outer-sphere" position="0 0 0">
+      <a-sphere color="#FFF"
+                scale="3.5 3.5 3.5"
+                material="transparent: true;
+                          opacity: 0.2;">
+      </a-sphere>
+    </a-entity>
+  </a-entity>
+
+  <!-- Lights -->
+  <a-entity id="ambient-light" light="type: ambient; color: #fdd2b1; intensity: 0.3" position="0 10 0" rotation="0 90 0"></a-entity>
+
+  <!-- Sun and Moon -->
+  <a-entity position="0 0 0" set-rotation>
+    <a-entity id="moon-el">
+      <a-entity light="type: point;
+                            intensity: 1.8;
+                            distance: 100;
+                            decay: 2;
+                            color: #90C4FF"
+                position="0 16 0">
+      </a-entity>
+      <a-entity id="moon" collada-model="#moon" scale="0.5 0.5 0.5" position="0 16 0"></a-entity>
+    <a-entity id="sun-el" rotation="0 90 0">
+      <a-entity light="type: point;
+                            intensity: 2;
+                            distance: 100;
+                            decay: 2;
+                            color: #fdd2b1"
+                position="0 -16 0"></a-entity>
+      <a-entity id="sun" collada-model="#sun" scale="0.5 0.5 0.5" position="0 -16 0" rotation="0 -90 0"></a-entity>
+    </a-entity>
+  </a-entity>
+
+    <!-- Satellite -->
+    <a-entity id="satellite-el">
+      <a-entity position="0 0 0">
+        <a-entity collada-model="#satellite" scale="0.3 0.3 0.3" position="0 20 0" rotation="0 90 0">
+          <a-entity id="satellite-sound-el" sound="src: #satellite-sound; autoplay: true; loop: true; volume: 0.3"></a-entity>
+        </a-entity>
+        <a-animation attribute="rotation"
+                     from="0 -45 0"
+                     to="0 -45 360"
+                     dur="15000"
+                     fill="forwards"
+                     repeat="indefinite"
+                     easing="linear">
+        </a-animation>
+      </a-entity>
+      <a-animation attribute="rotation"
+                   from="0 0 0"
+                   to="0 360 0"
+                   dur="40000"
+                   fill="forwards"
+                   repeat="indefinite"
+                   easing="linear">
+      </a-animation>
+    </a-entity>
+  </a-entity>
+
+  <!-- Sky -->
+  <a-sky id="sky-el" src="#sky"></a-sky>
+
+</a-scene>
+
+
+
+
+  </body>
+</html>
